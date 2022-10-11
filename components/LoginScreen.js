@@ -8,11 +8,9 @@ import {
 } from "react-native";
 import React from "react";
 import useAuth from "../hooks/useAuth";
-import { useTailwind } from "tailwind-rn/dist";
 
 const LoginScreen = () => {
-  const { login } = useAuth();
-  const tw = useTailwind();
+  const { signInWithGoogle } = useAuth();
 
   return (
     <View style={styles.screen}>
@@ -21,8 +19,8 @@ const LoginScreen = () => {
         style={styles.background}
         source={{ uri: "https://tinder.com/static/tinder.png" }}
       >
-        <TouchableOpacity style={styles.button}>
-          <Text style={styles.buttonText}>Sign in & swipe</Text>
+        <TouchableOpacity style={styles.button} onPress={signInWithGoogle}>
+          <Text style={styles.buttonText}>Sign in & start swiping</Text>
         </TouchableOpacity>
       </ImageBackground>
     </View>
@@ -48,6 +46,7 @@ const styles = StyleSheet.create({
   },
 
   buttonText: {
+    color: "#fe3c72",
     fontWeight: "bold",
     fontSize: 18,
   },

@@ -1,11 +1,14 @@
-import { View, Text } from "react-native";
+import { View, Text, SafeAreaView, Button } from "react-native";
 import React from "react";
+import { useNavigation } from "@react-navigation/native";
 
 const Chat = () => {
+  const navigation = useNavigation();
   return (
-    <View>
+    <SafeAreaView>
       <Text>This is the Chat Screen</Text>
-    </View>
+      <Button title="Go Back" onPress={() => navigation.navigate("Home")} />
+    </SafeAreaView>
   );
 };
 
