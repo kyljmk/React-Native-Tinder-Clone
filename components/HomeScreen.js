@@ -62,19 +62,35 @@ const HomeScreen = () => {
           cardIndex={0}
           verticalSwipe={false}
           animateCardOpacity
+          overlayLabels={{
+            left: {
+              title: "NOPE",
+              style: {
+                label: {
+                  textAlign: "right",
+                  color: "red",
+                },
+              },
+            },
+            right: {
+              title: "MATCH",
+              style: {
+                label: {
+                  color: "#4ded30",
+                },
+              },
+            },
+          }}
           renderCard={(card) => (
             <View key={card.id} style={styles.swiperCard}>
               <Image
                 style={styles.swiperCardImage}
                 source={{ uri: card.photoURL }}
               />
-              <View>
-                <View>
-                  <Text>
-                    {card.firstName}, {card.age}
-                  </Text>
-                  <Text>{card.occupation}</Text>
-                </View>
+              <View style={styles.imageTextContainer}>
+                <Text style={styles.imageTextName}>{card.firstName},</Text>
+                <Text style={styles.imageTextAge}>{card.age}</Text>
+                <Text style={styles.imageTextJob}>{card.occupation}</Text>
               </View>
             </View>
           )}
@@ -125,6 +141,43 @@ const styles = StyleSheet.create({
     height: "100%",
     width: "100%",
     borderRadius: 15,
+  },
+
+  imageTextContainer: {
+    position: "absolute",
+    bottom: 0,
+    backgroundColor: "white",
+    width: "100%",
+    height: 60,
+    paddingHorizontal: 20,
+    borderBottomRightRadius: 15,
+    borderBottomLeftRadius: 15,
+    flexDirection: "row",
+    alignItems: "center",
+    shadowColor: "000",
+    shadowOffset: {
+      width: 0,
+      height: 1,
+    },
+    shadowOpacity: 0.2,
+    shadowRadius: 1.41,
+    elevation: 2,
+  },
+
+  imageTextName: {
+    fontSize: 25,
+  },
+
+  imageTextAge: {
+    fontWeight: "bold",
+    marginLeft: 5,
+    fontSize: 25,
+  },
+
+  imageTextJob: {
+    color: "grey",
+    fontSize: 20,
+    marginLeft: "auto",
   },
 });
 
