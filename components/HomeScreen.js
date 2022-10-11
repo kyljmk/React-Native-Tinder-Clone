@@ -7,7 +7,7 @@ import {
   View,
   StyleSheet,
 } from "react-native";
-import React from "react";
+import React, { useRef } from "react";
 import { useNavigation } from "@react-navigation/native";
 import useAuth from "../hooks/useAuth";
 import { AntDesign, Entypo, Ionicons } from "@expo/vector-icons";
@@ -37,6 +37,7 @@ const dummyData = [
 const HomeScreen = () => {
   const navigation = useNavigation();
   const { logout, user } = useAuth();
+  const swipeRef = useRef(null);
 
   return (
     <SafeAreaView style={{ flex: 1 }}>
@@ -56,12 +57,19 @@ const HomeScreen = () => {
       </View>
       <View style={styles.swiper}>
         <Swiper
+          ref={swipeRef}
           containerStyle={{ backgroundColor: "transparent" }}
           cards={dummyData}
           stackSize={5}
           cardIndex={0}
           verticalSwipe={false}
           animateCardOpacity
+          onSwipedLeft={() => {
+            console.log("Swipe NOPE");
+          }}
+          onSwipedRight={() => {
+            console.log("Swipe MATCH");
+          }}
           overlayLabels={{
             left: {
               title: "NOPE",
@@ -69,6 +77,8 @@ const HomeScreen = () => {
                 label: {
                   textAlign: "right",
                   color: "red",
+                  fontSize: 40,
+                  marginRight: 10,
                 },
               },
             },
@@ -77,6 +87,8 @@ const HomeScreen = () => {
               style: {
                 label: {
                   color: "#4ded30",
+                  fontSize: 40,
+                  marginLeft: 10,
                 },
               },
             },
@@ -95,6 +107,14 @@ const HomeScreen = () => {
             </View>
           )}
         />
+      </View>
+      <View style={styles.buttonContainer}>
+        <TouchableOpacity style={styles.buttonCross}>
+          <Entypo name="cross" size={36} color="red" />
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.buttonHeart}>
+          <AntDesign name="heart" size={26} color="green" />
+        </TouchableOpacity>
       </View>
     </SafeAreaView>
   );
@@ -125,7 +145,7 @@ const styles = StyleSheet.create({
 
   swiper: {
     flex: 1,
-    margin: -6,
+    marginTop: -30,
   },
 
   swiperCard: {
@@ -178,6 +198,30 @@ const styles = StyleSheet.create({
     color: "grey",
     fontSize: 20,
     marginLeft: "auto",
+  },
+
+  buttonContainer: {
+    flexDirection: "row",
+    justifyContent: "space-evenly",
+    marginBottom: 10,
+  },
+
+  buttonCross: {
+    alignItems: "center",
+    justifyContent: "center",
+    borderRadius: "50%",
+    width: 60,
+    height: 60,
+    backgroundColor: "rgba(255,0,0, 0.3)",
+  },
+
+  buttonHeart: {
+    alignItems: "center",
+    justifyContent: "center",
+    borderRadius: "50%",
+    width: 60,
+    height: 60,
+    backgroundColor: "rgba(50,205,50, 0.3)",
   },
 });
 
