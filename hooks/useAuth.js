@@ -59,7 +59,7 @@ export const AuthProvider = ({ children }) => {
 
     signOut(auth)
       .catch((error) => setError(error))
-      .finally(setLoading(false));
+      .finally(() => setLoading(false));
   };
 
   const signInWithGoogle = async () => {
