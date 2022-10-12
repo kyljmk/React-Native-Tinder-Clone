@@ -7,11 +7,14 @@ import {
   View,
   StyleSheet,
 } from "react-native";
-import React, { useRef } from "react";
+import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { useNavigation } from "@react-navigation/native";
 import useAuth from "../hooks/useAuth";
 import { AntDesign, Entypo, Ionicons } from "@expo/vector-icons";
 import Swiper from "react-native-deck-swiper";
+import { collection, doc, onSnapshot } from "firebase/firestore";
+import { db } from "../Firebase";
+import { async } from "@firebase/util";
 
 const dummyData = [
   {
@@ -37,15 +40,47 @@ const dummyData = [
 const HomeScreen = () => {
   const navigation = useNavigation();
   const { logout, user } = useAuth();
+  const [profiles, setProfiles] = useState([]);
   const swipeRef = useRef(null);
 
+  useLayoutEffect(
+    () =>
+      onSnapshot(doc(db, "users", user.uid), (snapshot) => {
+        if (!snapshot.exists()) {
+          navigation.navigate("Modal");
+        }
+      }),
+    []
+  );
+
+  useEffect(() => {
+    let unsub;
+
+    const fetchCards = async () => {
+      unsub = onSnapshot(collection(db, "users"), (snapshot) => {
+        setProfiles(
+          snapshot.docs.map((doc) => ({
+            id: doc.id,
+            ...doc.data(),
+          }))
+        );
+      });
+    };
+
+    fetchCards();
+    return unsub;
+  }, []);
+  console.log(profiles);
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <View style={styles.header}>
         <TouchableOpacity style={styles.profileImageContainer} onPress={logout}>
           <Image source={{ uri: user.photoURL }} style={styles.profileImage} />
         </TouchableOpacity>
-        <TouchableOpacity style={styles.logoImageContainer}>
+        <TouchableOpacity
+          style={styles.logoImageContainer}
+          onPress={() => navigation.navigate("Modal")}
+        >
           <Image
             source={require("../tinderlogo.png")}
             style={styles.logoImage}
@@ -59,7 +94,7 @@ const HomeScreen = () => {
         <Swiper
           ref={swipeRef}
           containerStyle={{ backgroundColor: "transparent" }}
-          cards={dummyData}
+          cards={profiles}
           stackSize={5}
           cardIndex={0}
           verticalSwipe={false}
@@ -93,27 +128,53 @@ const HomeScreen = () => {
               },
             },
           }}
-          renderCard={(card) => (
-            <View key={card.id} style={styles.swiperCard}>
-              <Image
-                style={styles.swiperCardImage}
-                source={{ uri: card.photoURL }}
-              />
-              <View style={styles.imageTextContainer}>
-                <Text style={styles.imageTextName}>{card.firstName},</Text>
-                <Text style={styles.imageTextAge}>{card.age}</Text>
-                <Text style={styles.imageTextJob}>{card.occupation}</Text>
+          renderCard={(card) =>
+            card ? (
+              <View key={card.id} style={styles.swiperCard}>
+                <Image
+                  style={styles.swiperCardImage}
+                  source={{ uri: card.photoURL }}
+                />
+                <View style={styles.imageTextContainer}>
+                  <Text style={styles.imageTextName}>
+                    {card.displayName}, {card.age}
+                  </Text>
+                  <Text style={styles.imageTextJob}>{card.job}</Text>
+                </View>
               </View>
-            </View>
-          )}
+            ) : (
+              <View
+                style={[
+                  styles.swiperCard,
+                  { alignItems: "center", justifyContent: "center" },
+                ]}
+              >
+                <Text
+                  style={{ fontWeight: "bold", fontSize: 18, marginBottom: 10 }}
+                >
+                  No more profiles
+                </Text>
+                <Image
+                  style={{ height: 90, width: 90 }}
+                  source={{ uri: "https://links.papareact.com/6gb" }}
+                />
+              </View>
+            )
+          }
         />
       </View>
       <View style={styles.buttonContainer}>
-        <TouchableOpacity style={styles.buttonCross}>
-          <Entypo name="cross" size={36} color="red" />
+        <TouchableOpacity
+          style={styles.buttonCross}
+          onPress={() => swipeRef.current.swipeLeft()}
+        >
+          <Entypo name="cross" size={50} color="red" />
         </TouchableOpacity>
-        <TouchableOpacity style={styles.buttonHeart}>
-          <AntDesign name="heart" size={26} color="green" />
+        <TouchableOpacity
+          style={styles.buttonHeart}
+          onPress={() => swipeRef.current.swipeRight()}
+        >
+          <AntDesign name="heart" size={32} color="green" />
         </TouchableOpacity>
       </View>
     </SafeAreaView>
@@ -136,7 +197,10 @@ const styles = StyleSheet.create({
     borderRadius: "50%",
   },
 
-  logoImageContainer: {},
+  logoImageContainer: {
+    width: 70,
+    height: 70,
+  },
 
   logoImage: {
     width: 70,
@@ -145,14 +209,22 @@ const styles = StyleSheet.create({
 
   swiper: {
     flex: 1,
-    marginTop: -30,
+    marginTop: -15,
   },
 
   swiperCard: {
     backgroundColor: "white",
-    height: "75%",
+    height: "72%",
     borderRadius: 20,
     position: "relative",
+    shadowColor: "000",
+    shadowOffset: {
+      width: 0,
+      height: 1,
+    },
+    shadowOpacity: 0.2,
+    shadowRadius: 1.41,
+    elevation: 2,
   },
 
   swiperCardImage: {
@@ -168,20 +240,11 @@ const styles = StyleSheet.create({
     bottom: 0,
     backgroundColor: "white",
     width: "100%",
-    height: 60,
+    height: 80,
     paddingHorizontal: 20,
     borderBottomRightRadius: 15,
     borderBottomLeftRadius: 15,
-    flexDirection: "row",
-    alignItems: "center",
-    shadowColor: "000",
-    shadowOffset: {
-      width: 0,
-      height: 1,
-    },
-    shadowOpacity: 0.2,
-    shadowRadius: 1.41,
-    elevation: 2,
+    justifyContent: "center",
   },
 
   imageTextName: {
@@ -190,28 +253,27 @@ const styles = StyleSheet.create({
 
   imageTextAge: {
     fontWeight: "bold",
-    marginLeft: 5,
     fontSize: 25,
   },
 
   imageTextJob: {
     color: "grey",
     fontSize: 20,
-    marginLeft: "auto",
+    marginTop: 5,
   },
 
   buttonContainer: {
     flexDirection: "row",
     justifyContent: "space-evenly",
-    marginBottom: 10,
+    marginBottom: 20,
   },
 
   buttonCross: {
     alignItems: "center",
     justifyContent: "center",
     borderRadius: "50%",
-    width: 60,
-    height: 60,
+    width: 70,
+    height: 70,
     backgroundColor: "rgba(255,0,0, 0.3)",
   },
 
@@ -219,8 +281,8 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     borderRadius: "50%",
-    width: 60,
-    height: 60,
+    width: 70,
+    height: 70,
     backgroundColor: "rgba(50,205,50, 0.3)",
   },
 });
