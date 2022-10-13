@@ -1,4 +1,4 @@
-import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { Alert, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import React from "react";
 import { Foundation } from "@expo/vector-icons";
 import { Ionicons } from "@expo/vector-icons";
@@ -19,7 +19,10 @@ const Header = ({ title, callEnabled }) => {
       </View>
 
       {callEnabled && (
-        <TouchableOpacity style={styles.call}>
+        <TouchableOpacity
+          style={styles.call}
+          onPress={() => Alert.alert("This feature is Coming Soon!")}
+        >
           <Foundation name="telephone" size={24} color="#FF5864" />
         </TouchableOpacity>
       )}
