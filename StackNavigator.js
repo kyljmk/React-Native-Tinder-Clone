@@ -5,6 +5,7 @@ import Chat from "./components/Chat";
 import LoginScreen from "./components/LoginScreen";
 import Modal from "./components/Modal";
 import useAuth from "./hooks/useAuth";
+import Match from "./components/Match";
 
 const StackNavigator = () => {
   const Stack = createNativeStackNavigator();
@@ -20,6 +21,9 @@ const StackNavigator = () => {
           </Stack.Group>
           <Stack.Group screenOptions={{ presentation: "modal" }}>
             <Stack.Screen name="Modal" component={Modal} />
+          </Stack.Group>
+          <Stack.Group screenOptions={{ presentation: "transparentModal" }}>
+            <Stack.Screen name="Match" component={Match} />
           </Stack.Group>
         </>
       ) : (
