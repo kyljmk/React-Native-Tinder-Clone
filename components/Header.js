@@ -15,8 +15,14 @@ const Header = ({ title, callEnabled }) => {
         >
           <Ionicons name="chevron-back-outline" size={34} color="#FF5864" />
         </TouchableOpacity>
-        <Text style={styles.title}></Text>
+        <Text style={styles.title}>{title}</Text>
       </View>
+
+      {callEnabled && (
+        <TouchableOpacity style={styles.call}>
+          <Foundation name="telephone" size={24} color="#FF5864" />
+        </TouchableOpacity>
+      )}
     </View>
   );
 };
@@ -29,5 +35,28 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
+  },
+
+  returnAndTitle: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+
+  return: {
+    padding: 10,
+  },
+
+  title: {
+    fontSize: 26,
+    fontWeight: "bold",
+  },
+
+  call: {
+    marginRight: 10,
+    backgroundColor: "#fecaca",
+    borderRadius: "50%",
+    padding: 10,
+    width: 45,
+    alignItems: "center",
   },
 });
